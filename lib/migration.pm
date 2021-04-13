@@ -32,8 +32,6 @@ our @EXPORT = qw(
   setup_sle
   setup_migration
   register_system_in_textmode
-  remove_ltss
-  remove_espos
   disable_installation_repos
   record_disk_info
   check_rollback_system
@@ -105,34 +103,34 @@ sub register_system_in_textmode {
 
 # Remove LTSS product and manually remove its relevant package before migration
 # Also remove ltss from SCC_ADDONS setting for registration in upgrade target
-sub remove_ltss {
-    if (get_var('SCC_ADDONS', '') =~ /ltss/) {
-        my $scc_addons = get_var_array('SCC_ADDONS');
-        record_info 'remove ltss', 'got all updates from ltss channel, now remove ltss and drop it from SCC_ADDONS before migration';
-        if (check_var('SLE_PRODUCT', 'hpc')) {
-            remove_suseconnect_product('SLE_HPC-LTSS');
-        } elsif (is_sle('15+') && check_var('SLE_PRODUCT', 'sles')) {
-            remove_suseconnect_product('SLES-LTSS');
-        } else {
-            zypper_call 'rm -t product SLES-LTSS';
-            zypper_call 'rm sles-ltss-release-POOL';
-        }
-        set_var('SCC_ADDONS', join(',', grep { $_ ne 'ltss' } @$scc_addons));
-    }
-}
+#sub remove_ltss {
+#   if (get_var('SCC_ADDONS', '') =~ /ltss/) {
+#       my $scc_addons = get_var_array('SCC_ADDONS');
+#       record_info 'remove ltss', 'got all updates from ltss channel, now remove ltss and drop it from SCC_ADDONS before migration';
+#       if (check_var('SLE_PRODUCT', 'hpc')) {
+#           remove_suseconnect_product('SLE_HPC-LTSS');
+#       } elsif (is_sle('15+') && check_var('SLE_PRODUCT', 'sles')) {
+#           remove_suseconnect_product('SLES-LTSS');
+#       } else {
+#           zypper_call 'rm -t product SLES-LTSS';
+#           zypper_call 'rm sles-ltss-release-POOL';
+#       }
+#      set_var('SCC_ADDONS', join(',', grep { $_ ne 'ltss' } @$scc_addons));
+#    }
+#}
 
 # Remove ESPOS product before migration
 # Also remove espos from SCC_ADDONS setting for registration in upgrade target
-sub remove_espos {
-    if (get_var('SCC_ADDONS', '') =~ /espos/) {
-        my $scc_addons = get_var_array('SCC_ADDONS');
-        record_info 'remove espos', 'got all updates from espos channel, now remove espos and drop it from SCC_ADDONS before migration';
-        if (check_var('SLE_PRODUCT', 'hpc')) {
-            remove_suseconnect_product('SLE_HPC-ESPOS');
-            set_var('SCC_ADDONS', join(',', grep { $_ ne 'espos' } @$scc_addons));
-        }
-    }
-}
+# sub remove_espos {
+#  if (get_var('SCC_ADDONS', '') =~ /espos/) {
+#       my $scc_addons = get_var_array('SCC_ADDONS');
+#       record_info 'remove espos', 'got all updates from espos channel, now remove espos and drop it from SCC_ADDONS before migration';
+#       if (check_var('SLE_PRODUCT', 'hpc')) {
+#           remove_suseconnect_product('SLE_HPC-ESPOS');
+#           set_var('SCC_ADDONS', join(',', grep { $_ ne 'espos' } @$scc_addons));
+#       }
+#   }
+#}
 
 # Disable installation repos before online migration
 # s390x: use ftp remote repos as installation repos
