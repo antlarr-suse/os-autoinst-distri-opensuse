@@ -32,8 +32,6 @@ our @EXPORT = qw(
   setup_sle
   setup_migration
   register_system_in_textmode
-  remove_ltss
-  remove_espos
   disable_installation_repos
   record_disk_info
   check_rollback_system
