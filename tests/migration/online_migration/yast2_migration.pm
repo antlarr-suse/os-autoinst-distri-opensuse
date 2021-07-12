@@ -220,9 +220,14 @@ sub run {
             send_key 'alt-t';
         }
     }
-    assert_screen ['yast2-migration-installupdate', 'yast2-migration-proposal'], 700;
+    assert_screen [qw(yast2-migration-installupdate yast2-migration-license-agreement yast2-migration-proposal)], 150;
     if (match_has_tag 'yast2-migration-installupdate') {
         send_key 'alt-y';
+    }
+    if ( match_has_tag 'yast2-migration-license-agreement', 60) {
+        wait_screen_change { send_key "alt-a" };
+        assert_screen 'yast2_migration-license-agreenment-accepted', 60;
+        send_key 'alt-n';
     }
     if (yast2_migration_gnome_x11) {
         yast2_migration_handle_conflicts_x11($self);
