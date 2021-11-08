@@ -1,0 +1,13 @@
+name:    rmt_setup
+description:    >
+    This is for rmt server setup test
+schedule:
+  - boot/boot_to_desktop
+  - x11/rmt/rmt_setup
+    # - x11/rmt/rmt_setup/enable_all_modules
+    # - x11/rmt/rmt_setup/enable_multiple_products
+    # - x11/rmt/rmt_setup/disable_multiple_products
+    # - x11/rmt/rmt_setup/enable_by_product
+    # - x11/rmt/rmt_setup/enable_by_repo_id
+    # - x11/rmt/rmt_setup/mirror_repos
+    # - x11/rmt/rmt_setup/import_smt_data
