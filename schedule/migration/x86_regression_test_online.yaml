@@ -80,6 +80,7 @@ conditional_schedule:
         - console/vim
         - console/firewall_enabled
         - console/krb5
+        - console/yast2_samba
         - console/sshd
         - console/ssh_cleanup
         - console/mtab
