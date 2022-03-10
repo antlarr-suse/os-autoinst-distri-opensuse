@@ -258,9 +258,6 @@ sub rmt_wizard {
         record_soft_failure 'bsc#1195759';
         zypper_call 'in rmt-server';
     }
-    else {
-        die 'zypper in rmt-server failed';
-    }
     zypper_call 'in mariadb';
 
     enter_cmd "yast2 rmt;echo yast2-rmt-wizard-\$? > /dev/$serialdev";
