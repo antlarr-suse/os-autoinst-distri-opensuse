@@ -282,9 +282,12 @@ sub register_addons_cmd {
                 add_suseconnect_product($name, $ver[0], undef, undef, 300, $retry);
             }
             elsif (grep(/$name/, keys %ADDONS_REGCODE)) {
-                add_suseconnect_product($name, undef, undef, "-r " . $ADDONS_REGCODE{$name}, 300, $retry);
                 if ($name =~ /we/) {
                     zypper_call("--gpg-auto-import-keys ref");
+                    # When registering WE, there's a 3rd party repo: NVIDIA Driver. SUSEConnect need to use 
+                    # "--gpg-auto-import-keys" to handle 3rd party GPG keys.    
+                    add_suseconnect_product($name, undef, undef, "-r " . $ADDONS_REGCODE{$name} . " --gpg-auto-import-keys", 300, $retry);
+                } else {
                     add_suseconnect_product($name, undef, undef, "-r " . $ADDONS_REGCODE{$name}, 300, $retry);
                 }
             }
