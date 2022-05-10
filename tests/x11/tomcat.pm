@@ -67,7 +67,7 @@ sub run() {
     $self->switch_to_desktop();
     $self->start_firefox_with_profile() if is_sle('<15');
 
-    $self->firefox_open_url('http://localhost/examples/servlets');
+    $self->firefox_open_url('localhost/examples/servlets');
     send_key_until_needlematch('tomcat-servlet-examples-page', 'ret');
 
     $self->firefox_open_url('http://localhost/examples/jsp');
