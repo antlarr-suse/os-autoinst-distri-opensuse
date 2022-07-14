@@ -5,9 +5,7 @@ description:    >
      Rudimentary installation scenario for creating qcow2
      required by other HPC tests
 vars:
-  DESKTOP: textmode
   INSTALLONLY: 1
-  PATTERNS: base,minimal,apparmor
   SLE_PRODUCT: hpc
   HDDSIZEGB: 30
 conditional_schedule:
@@ -25,6 +23,10 @@ conditional_schedule:
     FLAVOR:
       Server-DVD-HPC-Incidents:
         - qa_automation/patch_and_reboot
+  scc_deregistration:
+    SCC_DEREGISTER:
+      1:
+        - console/scc_deregistration
 schedule:
   - '{{bootloader}}'
   - installation/welcome
@@ -53,6 +55,7 @@ schedule:
   - console/system_prepare
   - '{{patch_and_reboot_inci}}'
   - console/force_scheduled_tasks
+  - '{{scc_deregistration}}'
   - shutdown/grub_set_bootargs
   - shutdown/cleanup_before_shutdown
   - shutdown/shutdown
