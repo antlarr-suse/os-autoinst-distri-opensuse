@@ -1,0 +1,22 @@
+---
+name: create_hdd_ha
+description: >
+  AutoYaST installation with ha using default partitioning. Installation is
+  validated by execution set of smoke userspace tests.
+vars:
+  AUTOYAST: autoyast_sle15/create_hdd/create_hdd_ha.xml
+  AUTOYAST_PREPARE_PROFILE: '1'
+  DESKTOP: textmode
+  SYSTEM_ROLE: HA_node
+schedule:
+  - autoyast/prepare_profile
+  - installation/bootloader
+  - autoyast/installation
+  - installation/first_boot
+  - console/system_prepare
+  - console/hostname
+  - console/force_scheduled_tasks
+  - console/scc_deregistration
+  - shutdown/grub_set_bootargs
+  - shutdown/cleanup_before_shutdown
+  - shutdown/shutdown
