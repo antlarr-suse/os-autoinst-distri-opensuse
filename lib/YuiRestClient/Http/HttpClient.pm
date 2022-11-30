@@ -6,6 +6,9 @@ use warnings;
 
 use Mojo::UserAgent;
 use YuiRestClient::Logger;
+use testapi;
+use Mojo::JSON 'encode_json';
+use Data::Dumper;
 
 my $ua = Mojo::UserAgent->new;
 
@@ -15,6 +18,18 @@ sub http_get {
     my $url = Mojo::URL->new($args{uri});
     sleep(1) if $args{add_delay};
     my $res = $ua->get($url)->result;
+    #diag not support use $res->code, it will only unpack $res!!
+    my $a = $res->code; 
+    my $b = $res->message; 
+    my $c = $res->body; 
+    my $d = encode_json $res->json;
+    my $e = Dumper($res);
+    #diag "!!!=dum==!!!!! Dumper($res)";
+    #diag "!!!=code==!!!!! $a";
+    #diag "!!!=message==!!!!! $b";
+    diag "!!!=body==!!!!! $c";
+    #diag "!!!=json==!!!!! $d";
+    #diag "!!!=res==!!!!! $e";
     return $res if $res->is_success;
     # Die if non OK response code
     YuiRestClient::Logger->get_instance()->error('Widget not found by url: ' . $url);
