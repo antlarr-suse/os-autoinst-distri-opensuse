@@ -305,6 +305,7 @@
       <package>dosfstools</package>
       <package>btrfsprogs</package>
       <package>autoyast2</package>
+      <package>tigervnc</package>
     </packages>
     <patterns t="list">
       <pattern>apparmor</pattern>

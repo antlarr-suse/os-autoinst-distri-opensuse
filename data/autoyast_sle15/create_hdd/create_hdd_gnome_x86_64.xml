@@ -282,7 +282,10 @@
         <service>wickedd-nanny</service>
         <service>wicked</service>
         <service>sshd</service>
-        <service>systemd-remount-fs</service>
+	<service>systemd-remount-fs</service>
+        <service>ssh</service>
+        <service>tigervnc</service>
+        <service>tigervnc-https</service>
       </enable>
     </services>
   </services-manager>
@@ -303,6 +306,7 @@
       <package>e2fsprogs</package>
       <package>btrfsprogs</package>
       <package>autoyast2</package>
+      <package>tigervnc</package>
     </packages>
     <patterns t="list">
       <pattern>apparmor</pattern>
