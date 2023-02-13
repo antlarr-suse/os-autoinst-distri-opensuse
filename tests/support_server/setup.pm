@@ -559,6 +559,7 @@ sub setup_nfs_server {
 sub run {
     # Persist DHCP configuration for VMware & HyperV virtualization smoketests
     unless (is_vmware_virtualization || is_hyperv_virtualization) {
+	systemctl("stop firewalld");
         configure_static_network('10.0.2.1/24');
     }
 
