@@ -7,7 +7,6 @@ conditional_schedule:
       s390x:
         - shutdown/svirt_upload_assets
 vars:
-  AUTOYAST: autoyast_sle15/create_hdd/create_hdd_gnome_%ARCH%.xml
   DESKTOP: gnome
 schedule:
   - autoyast/prepare_profile
