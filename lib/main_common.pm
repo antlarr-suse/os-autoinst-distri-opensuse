@@ -1983,6 +1983,7 @@ sub load_x11_installation {
     loadtest "x11/x11_setup";
     loadtest 'qa_automation/patch_and_reboot' if is_updates_tests;
     loadtest "console/system_prepare";
+    loadtest "autoyast/clone";
     loadtest "console/hostname" unless is_bridged_networking;
     loadtest "console/force_scheduled_tasks" unless is_jeos;
     loadtest "shutdown/grub_set_bootargs";

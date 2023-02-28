@@ -26,3 +26,9 @@ schedule:
   - installation/performing_installation/confirm_reboot
   - installation/grub_test
   - installation/first_boot
+  - console/system_prepare
+  - autoyast/clone
+  - console/hostname
+  - console/force_scheduled_tasks
+  - shutdown/cleanup_before_shutdown
+  - shutdown/shutdown

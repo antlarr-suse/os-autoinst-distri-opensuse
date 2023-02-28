@@ -1,39 +1,49 @@
 ---
-name:           offline_install+skip_registration
+name:           gnome_installation
 description:    >
-  Offline installation. Skipping registration for SLE 15, as requires network connection.
-  This is default behavior for SLE 12.
+  The standard scenario where we mainly just follow installation
+  suggestions without any adjustments as long as the default desktop is gnome.
 vars:
-  SCC_REGISTER: 'none'
-  ADDONS: all-packages
+  MAX_JOB_TIME: 10800
 schedule:
   - installation/bootloader_start
   - installation/welcome
-  - installation/network_configuration
   - installation/scc_registration
   - installation/addon_products_sle
-  - installation/release_notes_from_rpm
   - installation/system_role
   - installation/partitioning
   - installation/partitioning_finish
   - installation/installer_timezone
   - installation/user_settings
   - installation/user_settings_root
+  - installation/resolve_dependency_issues
   - installation/installation_overview
   - installation/disable_grub_timeout
   - installation/start_install
   - installation/await_install
   - installation/logs_from_installation_system
   - installation/reboot_after_installation
-  - installation/grub_test
+  - '{{handle_reboot}}'
   - installation/first_boot
   - console/system_prepare
   - autoyast/clone
   - console/hostname
   - console/force_scheduled_tasks
-  - console/orphaned_packages_check
-  - console/consoletest_finish
+  - shutdown/grub_set_bootargs
   - shutdown/cleanup_before_shutdown
   - shutdown/shutdown
-test_data:
-  <<: !include test_data/yast/skip_registration/default_repos.yaml
+  - '{{upload_assets}}'
+conditional_schedule:
+  upload_assets:
+    ARCH:
+      s390x:
+        - shutdown/svirt_upload_assets
+  handle_reboot:
+    ARCH:
+      s390x:
+        - installation/handle_reboot
+      x86_64:
+        - installation/grub_test
+      aarch64:
+        - installation/grub_test
+
