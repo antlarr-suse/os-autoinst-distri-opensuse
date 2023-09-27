@@ -12,13 +12,12 @@ use parent 'Installation::Navigation::NavigationBase';
 use strict;
 use warnings;
 use testapi;
-use version_utils qw(is_sle);
-
+use version_utils qw(is_sle is_tumbleweed);
 
 sub init {
     my $self = shift;
     $self->SUPER::init();
-    $self->{txb_grub_timeout} = $self->{app}->textbox({id => "\"Bootloader::TimeoutWidget\""}) if (is_sle);
+    $self->{txb_grub_timeout} = $self->{app}->textbox({id => "\"Bootloader::TimeoutWidget\""}) if ((is_sle) || (is_tumbleweed));
     $self->{txb_grub_timeout} = $self->{app}->textbox({id => "\"Bootloader::Grub2Widget::TimeoutWidget\""}) if (check_var('FLAVOR', 'Staging-DVD'));
     return $self;
 }
