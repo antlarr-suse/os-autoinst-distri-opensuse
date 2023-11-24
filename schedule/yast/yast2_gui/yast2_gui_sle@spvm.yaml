@@ -1,0 +1,36 @@
+---
+name:           yast2_gui
+description: >
+  Test for yast2 UI, GUI.
+  Installation product with textmode by libuyui and then test
+  for yast2 UI, GUI on ppc64le.
+schedule:
+  system_preparation:
+    - console/prepare_test_data
+    - console/consoletest_setup
+    - console/hostname
+  system_validation:
+    - yast2_gui/yast2_system_settings
+    - yast2_gui/yast2_control_center
+    - yast2_gui/yast2_expert_partitioner
+    - yast2_gui/yast2_software_management
+    - yast2_gui/yast2_security
+    - yast2_gui/yast2_firewall_stop_service
+    - yast2_gui/yast2_firewall_start_service
+    - yast2_gui/yast2_firewall_set_default_zone_prepare
+    - yast2_gui/yast2_firewall_set_default_zone
+    - yast2_gui/yast2_firewall_set_interface
+    - yast2_gui/yast2_firewall_set_service_port
+    - yast2_gui/yast2_bootloader
+    - yast2_gui/yast2_bootloader/bootcode_options
+    - x11/yast2_snapper
+    - yast2_gui/yast2_lang
+    - yast2_gui/yast2_users
+    - yast2_gui/yast2_datetime
+    - yast2_gui/yast2_hostnames
+    - yast2_gui/yast2_network_settings
+    - yast2_gui/yast2_lan_ifcfg_errors
+    - yast2_gui/yast2_lan_restart_bridge
+    - yast2_gui/yast2_lan_restart_vlan
+    - yast2_gui/yast2_lan_restart_bond
+    - console/validate_installed_patterns
