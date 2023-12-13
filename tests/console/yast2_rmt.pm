@@ -76,6 +76,8 @@ sub test_config {
 sub run {
     select_console 'root-console';
     zypper_call("in rmt-server yast2-rmt");
+    assert_script_run("systemctl enable firewalld");
+    assert_script_run("systemctl status firewalld");
     test_ui;
     test_config;
     # Remove rmt-server and nginx to avoid conflict with yast2_http
