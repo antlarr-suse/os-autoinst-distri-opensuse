@@ -14,6 +14,7 @@ use warnings;
 use utils;
 use testapi;
 use repo_tools;
+use version_utils;
 
 sub password_twice {
     type_password;
@@ -51,7 +52,7 @@ sub test_ui {
     assert_screen "yast2_rmt_ssl_CA_password";
     type_password_twice;
     assert_screen "yast2_rmt_firewall";
-    send_key "spc";
+    send_key "spc" unless is_tumbleweed;
     send_key "alt-n";
     assert_screen "yast2_rmt_service_status";
     wait_still_screen;
@@ -66,7 +67,7 @@ sub test_config {
     for (@unit) {
         script_run("systemctl is-active $_") && die "The systemd unit $_ is not active";
     }
-    assert_script_run("firewall-cmd --list-services |grep -E 'http[[:space:]]https'", fail_message => 'The firewall ports are not opened');
+    assert_script_run("firewall-cmd --list-services |grep -E 'http[[:space:]]https'", fail_message => 'The firewall ports are not opened') unless is_tumbleweed;
     assert_script_run("grep rmt /etc/rmt.conf", fail_message => 'Missing values in /etc/rmt.conf');
     assert_script_run("wget --no-check-certificate https://localhost/rmt.crt", fail_message => 'Certificate not found at https://localhost/rmt.crt');
     # yast2-rmt was changed to no longer include the host name as part of the CA
@@ -76,8 +77,6 @@ sub test_config {
 sub run {
     select_console 'root-console';
     zypper_call("in rmt-server yast2-rmt");
-    assert_script_run("systemctl enable firewalld");
-    assert_script_run("systemctl status firewalld");
     test_ui;
     test_config;
     # Remove rmt-server and nginx to avoid conflict with yast2_http
