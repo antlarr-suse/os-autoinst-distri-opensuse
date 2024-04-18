@@ -571,11 +571,11 @@ sub bootmenu_default_params {
         if (check_var('VIDEOMODE', 'text')) {
             push @params, "textmode=1";
         }
-        push @params, "Y2DEBUG=1";
+        push @params, "vga=791";
     }
     else {
         # On JeOS and MicroOS we don't have YaST installer.
-        push @params, "Y2DEBUG=1" unless is_jeos || is_microos || is_selfinstall || (is_sle_micro && get_var('BOOT_HDD_IMAGE'));
+        push @params, "vga=791" unless is_jeos || is_microos || is_selfinstall || (is_sle_micro && get_var('BOOT_HDD_IMAGE'));
 
         # gfxpayload variable replaced vga option in grub2
         if (!(is_sle_micro && get_var('BOOT_HDD_IMAGE')) && !is_jeos && !is_microos && !is_selfinstall && (is_i586 || is_x86_64)) {
