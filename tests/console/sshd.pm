@@ -111,6 +111,8 @@ sub test_cryptographic_policies() {
 }
 
 sub check_journal {
+    # Dump the whole sshd journal to the serial terminal
+    script_run("journalctl -b -u sshd.service");
     # bsc#1175310 bsc#1181308 - Detect serious errors as they can be invisible because sshd may silently recover
     if (script_run("journalctl -b -u sshd.service | grep -A6 -B24 'segfault\\|fatal'") == 0) {
         my $journalctl = script_output("journalctl -b -u sshd.service | grep 'segfault\\|fatal'", proceed_on_failure => 1);
