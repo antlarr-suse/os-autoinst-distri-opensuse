@@ -101,6 +101,8 @@ sub test_cryptographic_policies() {
     record_info("Restart sshd", "Restart sshd.service");
     systemctl("restart sshd");
 
+    script_run("date");
+
     # Add all the ssh public key hashes as known hosts
     assert_script_run("ssh-keyscan -H localhost > ~/.ssh/known_hosts");
 
@@ -108,6 +110,7 @@ sub test_cryptographic_policies() {
     foreach my $policy (@policies) {
         $policy->test_algorithms(remote_user => $remote_user);
     }
+    script_run("date");
 }
 
 sub check_journal {
