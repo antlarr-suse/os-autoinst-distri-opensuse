@@ -35,10 +35,12 @@ sub run {
     select_serial_terminal;
 
     systemctl('start sshd');
+    script_run("date");
 
     # generate ssh key and use same key for root and bernhard
     if (script_run('! test -e ~/.ssh/id_rsa') == 0) {
         assert_script_run('ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa');
+	script_run("date");
     }
 
     # copy and add root key into authorized_keys and public key into known_hosts of both root and user
@@ -49,6 +51,7 @@ sub run {
         assert_script_run('chmod 600 ~/.ssh/*');
         assert_script_run('cat ~/.ssh/id_rsa.pub | tee -a ~/.ssh/authorized_keys');
         assert_script_run("ssh-keyscan localhost 127.0.0.1 ::1 | tee -a ~/.ssh/known_hosts");
+	script_run("date");
     }
     else {
         assert_script_run("mkdir -pv ~/.ssh ~$user/.ssh");
@@ -57,7 +60,19 @@ sub run {
         assert_script_run("chmod 600 ~{,$user}/.ssh/*");
         assert_script_run("chown -R bernhard ~$user/.ssh");
         assert_script_run("cat ~/.ssh/id_rsa.pub | tee -a ~{,$user}/.ssh/authorized_keys");
-        assert_script_run("ssh-keyscan localhost 127.0.0.1 ::1 | tee -a ~{,$user}/.ssh/known_hosts");
+        script_run("date");
+        assert_script_run("ssh-keyscan localhost | tee -a ~{,$user}/.ssh/known_hosts");
+        script_run("date");
+        script_run("sleep 3");
+        script_run("date");
+        assert_script_run("ssh-keyscan 127.0.0.1 | tee -a ~{,$user}/.ssh/known_hosts");
+        script_run("date");
+        script_run("sleep 3");
+        script_run("date");
+        assert_script_run("ssh-keyscan ::1 | tee -a ~{,$user}/.ssh/known_hosts");
+        script_run("date");
+        script_run("sleep 3");
+        script_run("date");
     }
 
     # Stop serial-getty on serial console to avoid serial output pollution with login prompt

@@ -73,6 +73,7 @@ sub ssh_basic_check {
     # Check that the daemons listens on right addresses/ports
     check_sshd_port();
     # create a new user to test sshd
+    script_run("date");
     script_run("userdel -rf $ssh_testman");
     assert_script_run("useradd -m $ssh_testman");
     assert_script_run("echo $changepwd | chpasswd");
@@ -102,6 +103,8 @@ sub ssh_basic_check {
     # Make sure user has both public keys in authorized_keys
     assert_script_run "su -c \"cp /home/$ssh_testman/.ssh/{id_rsa.pub,authorized_keys}\"";
     assert_script_run "cat ~/.ssh/id_rsa.pub >> /home/$ssh_testman/.ssh/authorized_keys";
+    script_run("date");
+
 
     # Test non-interactive SSH
     assert_script_run "ssh -4v $ssh_testman\@localhost bash -c 'whoami | grep $ssh_testman'";
@@ -111,6 +114,9 @@ sub ssh_basic_check {
     background_script_run "ssh -vNL 4242:localhost:22 $ssh_testman\@localhost 2>/tmp/ssh_log1";
     background_script_run "ssh -vNR 0.0.0.0:5252:localhost:22 $ssh_testman\@localhost 2>/tmp/ssh_log2";
     assert_script_run 'until ss -tulpn|grep sshd|grep -E "4242|5252";do sleep 1;done';
+
+    script_run("date");
+
 
     # Scan public keys on forwarded ports
     # Add a workaround about bsc#1193275 in FIPS test
@@ -127,31 +133,41 @@ sub ssh_basic_check {
     # Connect to forwarded ports
     assert_script_run "ssh -v -p 4242 $ssh_testman\@localhost whoami";
     assert_script_run "ssh -v -p 5252 $ssh_testman\@localhost whoami";
+    script_run("date");
+
 
     # Copy the list of known hosts to $ssh_testman's .ssh directory
     assert_script_run "install -m 0400 -o $ssh_testman ~/.ssh/known_hosts /home/$ssh_testman/.ssh/known_hosts";
 
     # Test SSH command within SSH command
     assert_script_run "ssh -v -p 4242 -tt $ssh_testman\@localhost ssh -tt $ssh_testman\@localhost whoami";
+    script_run("date");
+
 
     # Test ProxyCommand option
     assert_script_run "ssh -v -t -o ProxyCommand='ssh -v $ssh_testman\@localhost nc localhost 4242' $ssh_testman\@localhost whoami";
+    script_run("date");
+
 
     # Test JumpHost option
     if (is_leap('15.0+') || is_tumbleweed || is_sle('15+')) {
         assert_script_run("ssh -v -J $ssh_testman\@localhost:4242 $ssh_testman\@localhost whoami");
     }
+    script_run("date");
+
 
     # SCP (poo#46937)
     assert_script_run "echo 'sshd.pm: Testing SCP subsystem' | logger";
     assert_script_run "scp -4v $ssh_testman\@localhost:/etc/resolv.conf /tmp";
     assert_script_run "scp -4v $ssh_testman\@localhost:/etc/{group,passwd} /tmp";
     assert_script_run "scp -4v $ssh_testman\@localhost:/etc/ssh/*.pub /tmp";
+    script_run("date");
 }
 
 sub do_ssh_cleanup {
     # Restore ~/.ssh generated in consotest_setup
     # poo#68200. Confirm the ~/.ssh_bck directory is exist in advance and then restore, in order to avoid the null restore
+    script_run("date");
     assert_script_run 'rm -rf ~/.ssh';
     assert_script_run 'if [ -d ~/.ssh_bck ]; then mv ~/.ssh_bck ~/.ssh; fi';
 
