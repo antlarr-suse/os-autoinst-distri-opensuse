@@ -37,7 +37,11 @@ sub run {
     my $self = shift;
     select_serial_terminal;
 
-    script_run("zypper ar -f https://download.suse.de/ibs/home:/alarrosa:/branches:/SUSE:/SLE-15-SP6:/GA:/openssh-9.7/standard/ openssh_9.7");
+    script_run("zypper ar --refresh http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP6/SUSE:CA.repo");
+    script_run("zypper ref");
+    script_run("ssl_verify=host zypper in ca-certificates-suse");
+    script_run("zypper ar -f --no-gpgcheck https://download.suse.de/ibs/home:/alarrosa:/branches:/SUSE:/SLE-15-SP6:/GA:/openssh-9.7/standard/ openssh_9.7");
+    script_run("zypper ref");
     script_run("zypper up -r openssh_9.7 --allow-vendor-change -y openssh openssh-server openssh-clients openssh-common");
     my $ssh_testman = "sshboy";
     services::sshd::prepare_test_data();
@@ -97,6 +101,8 @@ sub test_cryptographic_policies() {
     record_info("Restart sshd", "Restart sshd.service");
     systemctl("restart sshd");
 
+    script_run("date");
+
     # Add all the ssh public key hashes as known hosts
     assert_script_run("ssh-keyscan -H localhost > ~/.ssh/known_hosts");
 
@@ -104,9 +110,12 @@ sub test_cryptographic_policies() {
     foreach my $policy (@policies) {
         $policy->test_algorithms(remote_user => $remote_user);
     }
+    script_run("date");
 }
 
 sub check_journal {
+    # Dump the whole sshd journal to the serial terminal
+    script_run("journalctl -b -u sshd.service");
     # bsc#1175310 bsc#1181308 - Detect serious errors as they can be invisible because sshd may silently recover
     if (script_run("journalctl -b -u sshd.service | grep -A6 -B24 'segfault\\|fatal'") == 0) {
         my $journalctl = script_output("journalctl -b -u sshd.service | grep 'segfault\\|fatal'", proceed_on_failure => 1);
