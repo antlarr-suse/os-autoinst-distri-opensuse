@@ -37,12 +37,6 @@ sub run {
     my $self = shift;
     select_serial_terminal;
 
-    script_run("zypper ar --refresh http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP6/SUSE:CA.repo");
-    script_run("zypper ref");
-    script_run("ssl_verify=host zypper in -y ca-certificates-suse");
-    script_run("zypper ar -f --no-gpgcheck https://download.suse.de/ibs/home:/alarrosa:/branches:/SUSE:/SLE-15-SP6:/GA:/openssh-9.7/standard/ openssh_9.7");
-    script_run("zypper ref");
-    script_run("zypper up -r openssh_9.7 --allow-vendor-change -y openssh openssh-server openssh-clients openssh-common");
     my $ssh_testman = "sshboy";
     services::sshd::prepare_test_data();
     # Stop the firewall if it's available
