@@ -818,6 +818,7 @@ sub activate_console {
 
     # Select configure serial and redirect to root-ssh instead
     return use_ssh_serial_console if (get_var('BACKEND', '') =~ /ikvm|ipmi|spvm|pvm_hmc/ && $console =~ m/^(root-console|install-shell|log-console)$/);
+    diag "step 1";
     if ($console eq 'install-shell') {
         if (get_var("LIVECD")) {
             # LIVE CDs do not run inst-consoles as started by inst-linux (it's regular live run, auto-starting yast live installer)
@@ -898,12 +899,15 @@ sub activate_console {
         assert_screen("text-logged-in-$user", 60);
     }
     elsif ($type eq 'ssh') {
+        diag "step 3";
         $user ||= 'root';
         handle_password_prompt;
+        diag "step 4";
         ensure_user($user);
         assert_screen(["text-logged-in-$user", "text-login"], 60);
         $self->set_standard_prompt($user, skip_set_standard_prompt => $args{skip_set_standard_prompt});
         set_sshserial_dev if has_serial_over_ssh;    # We can use ssh console with a real serial already grabbed
+        diag "step 5";
     }
     elsif ($console eq 'svirt' || $console eq 'hyperv-intermediary') {
         my $os_type = (check_var('VIRSH_VMM_FAMILY', 'hyperv') && $console eq 'svirt') ? 'windows' : 'linux';
@@ -938,6 +942,7 @@ sub activate_console {
         }
     }
     if (get_var('TUNNELED') && $name !~ /tunnel/) {
+        diag "step tunneled";
         die "Console '$console' activated in TUNNEL mode activated but tunnel(s) are not yet initialized, use the 'tunnel' console and call 'setup_ssh_tunnels' first" unless get_var('_SSH_TUNNELS_INITIALIZED');
         # The verbose output is visible only at the tunnel-console - it doesn't interfere with tests as it isn't piped to /dev/sshserial
         $self->script_run('ssh -E /var/tmp/ssh_sut.log -vt sut', 0);
@@ -969,11 +974,13 @@ configure a timeout value different than default.
 sub console_selected {
     my ($self, $console, %args) = @_;
     if ((exists $testapi::testapi_console_proxies{'root-ssh'}) && $console =~ m/^(root-console|install-shell|log-console)$/) {
+        diag "console_selected1";
         $console = 'root-ssh';
         my $ret = query_isotovideo('backend_select_console', {testapi_console => $console});
         die $ret->{error} if $ret->{error};
         $autotest::selected_console = $console;
     }
+    diag "console_selected2";
 
     my ($name, $user, $type) = $self->get_console_info($console);
     $self->{serial_term_prompt} = $self->prompt_for_user($user);
@@ -987,6 +994,7 @@ sub console_selected {
         set_var('CONSOLE_JUST_ACTIVATED', 0);
         return;
     }
+    diag "console_selected3";
     $self->hyperv_console_switch($console, console_nr($console));
     set_var('CONSOLE_JUST_ACTIVATED', 0);
     # x11 needs special handling because we can not easily know if screen is
@@ -994,11 +1002,13 @@ sub console_selected {
     if ($args{tags} =~ /x11/) {
         return ensure_unlocked_desktop;
     }
+    diag "console_selected4";
     assert_screen($args{tags}, no_wait => 1, timeout => $args{timeout});
     if (match_has_tag('workqueue_lockup')) {
         record_soft_failure 'bsc#1126782';
         send_key 'ret';
     }
+    diag "console_selected5";
 }
 
 1;
