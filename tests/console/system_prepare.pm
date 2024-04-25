@@ -102,7 +102,7 @@ sub run {
     # stop and disable PackageKit
     quit_packagekit;
     script_run("date");
-    script_run("sleep 191");
+    script_run("sleep 191", timeout => 220, die_on_timeout => 0);
     script_run("date");
 }
 
