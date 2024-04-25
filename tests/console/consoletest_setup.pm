@@ -34,8 +34,11 @@ sub run {
     my $user = $testapi::username;
     select_serial_terminal;
 
+    script_run("sleep 3m");
+    script_run("date");
     systemctl('start sshd');
     script_run("date");
+    script_run("sleep 197");
 
     # generate ssh key and use same key for root and bernhard
     if (script_run('! test -e ~/.ssh/id_rsa') == 0) {
@@ -63,15 +66,15 @@ sub run {
         script_run("date");
         assert_script_run("ssh-keyscan localhost | tee -a ~{,$user}/.ssh/known_hosts");
         script_run("date");
-        script_run("sleep 3");
+        script_run("sleep 79");
         script_run("date");
         assert_script_run("ssh-keyscan 127.0.0.1 | tee -a ~{,$user}/.ssh/known_hosts");
         script_run("date");
-        script_run("sleep 3");
+        script_run("sleep 83");
         script_run("date");
         assert_script_run("ssh-keyscan ::1 | tee -a ~{,$user}/.ssh/known_hosts");
         script_run("date");
-        script_run("sleep 3");
+        script_run("sleep 89");
         script_run("date");
     }
 
