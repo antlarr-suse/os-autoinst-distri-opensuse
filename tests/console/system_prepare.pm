@@ -28,22 +28,6 @@ use warnings;
 
 sub run {
     my ($self) = @_;
-    # stop and disable PackageKit
-    script_run("systemctl mask packagekit; systemctl stop packagekit; while pgrep packagekitd; do sleep 1; done", timeout => 600, die_on_timeout => 0);
-
-    script_run("pkill -9 packagekitd || true");
-
-    # based on wait_quit_zypper
-    script_run('for ((i=90; i>0; i--)) do if (! pgrep \'zypper|purge-kernels|rpm|packagekitd\' > /dev/null); then sleep 20; break; else sleep 10; continue; fi done', timeout => 900, die_on_timeout => 0);
-
-    script_run("zypper ar --refresh http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP6/SUSE:CA.repo", timeout => 640);
-    script_run("zypper ref", timeout => 240);
-    script_run("ssl_verify=host zypper in -y ca-certificates-suse", timeout => 240);
-    script_run("zypper ar -f --no-gpgcheck https://download.suse.de/ibs/home:/alarrosa:/branches:/SUSE:/SLE-15-SP6:/GA:/openssh-9.7/standard/ openssh_9.7", timeout => 240);
-    script_run("zypper ref", timeout => 240);
-    script_run("zypper up -r openssh_9.7 --allow-vendor-change -y openssh openssh-server openssh-clients openssh-common", timeout => 240);
-
-    systemctl("restart sshd");
 
     select_console 'root-console';
 
@@ -115,6 +99,32 @@ sub run {
     }
 
     assert_script_run 'rpm -q systemd-coredump || zypper -n in systemd-coredump || true', timeout => 200 if get_var('COLLECT_COREDUMPS');
+
+    script_run("zypper ar --refresh http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP6/SUSE:CA.repo", timeout => 640);
+    script_run("zypper ref", timeout => 240);
+    script_run("ssl_verify=host zypper in -y ca-certificates-suse", timeout => 240);
+    script_run("zypper ar -f --no-gpgcheck https://download.suse.de/ibs/home:/alarrosa:/branches:/SUSE:/SLE-15-SP6:/GA:/openssh-9.7/standard/ openssh_9.7", timeout => 240);
+    script_run("zypper ref", timeout => 240);
+    script_run("zypper up -r openssh_9.7 --allow-vendor-change -y openssh openssh-server openssh-clients openssh-common", timeout => 240);
+
+    # Let's reboot the system to reset the state and try to get select_console to trigger the issue again
+    script_run("systemctl reboot", timeout => 10);
+    sleep(300);
+
+    reset_consoles;
+
+    select_console 'root-console';
+
+    ensure_serialdev_permissions;
+
+    prepare_serial_console;
+
+    if (!check_var('DESKTOP', 'textmode')) {
+        # Make sure packagekit is not running, or it will conflict with SUSEConnect.
+        quit_packagekit;
+        # poo#87850 wait the zypper processes in background to finish and release the lock.
+        wait_quit_zypper;
+    }
 
     script_run("date");
     script_run("sleep 191", timeout => 220, die_on_timeout => 0);
