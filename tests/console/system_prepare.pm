@@ -23,6 +23,9 @@ use registration;
 use services::registered_addons 'full_registered_check';
 use List::MoreUtils 'uniq';
 use migration 'modify_kernel_multiversion';
+use power_action_utils 'power_action';
+use utils qw(reconnect_mgmt_console);
+use Utils::Backends 'is_pvm';
 use strict;
 use warnings;
 
@@ -108,10 +111,19 @@ sub run {
     script_run("zypper up -r openssh_9.7 --allow-vendor-change -y openssh openssh-server openssh-clients openssh-common", timeout => 240);
 
     # Let's reboot the system to reset the state and try to get select_console to trigger the issue again
-    script_run("systemctl reboot", timeout => 10);
-    sleep(300);
+    #script_run("systemctl reboot", timeout => 10);
+    #sleep(300);
 
+    power_action('reboot', textmode => 1, keepconsole => 1);
+    sleep(30);
     reset_consoles;
+    reconnect_mgmt_console if is_pvm;
+    $self->wait_boot(ready_time => 300, bootloader_time => 300, textmode => 1);
+
+    #reconnect_mgmt_console();
+    #$self->wait_boot_past_bootloader;
+
+    #reset_consoles;
 
     select_console 'root-console';
 
